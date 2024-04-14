@@ -1,0 +1,162 @@
+from mage_ai.settings.repo import get_repo_path
+from mage_ai.io.config import ConfigFileLoader
+from mage_ai.io.s3 import S3
+from os import path
+if 'data_loader' not in globals():
+    from mage_ai.data_preparation.decorators import data_loader
+if 'test' not in globals():
+    from mage_ai.data_preparation.decorators import test
+
+import os, argparse
+import boto3
+import pandas as pd
+from botocore import UNSIGNED, exceptions
+from botocore.client import Config
+
+import datetime as dt
+from datetime import date, timedelta
+
+from google.cloud import storage
+
+bucket_name =  'aws-public-blockchain'
+blocks_prefix = 'v1.0/eth/blocks/date='
+transactions_prefix = 'v1.0/eth/transactions/date='
+
+blocks_output = 'raw/eth/blocks'
+transaction_output = 'raw/eth/transactions'
+
+def prepare_object_prefix(run_date:date):
+    print(run_date)
+    if not run_date:
+        run_date = dt.date.today()
+
+    start_date = run_date - dt.timedelta(days=8)
+    end_date = run_date - dt.timedelta(days=1)
+    
+    block_objs = []
+    transaction_objs = []
+    
+    for n in range(int((end_date - start_date).days)):
+        
+        date_prefix = start_date + timedelta(n)
+        
+        block_obj_prefix = f"{blocks_prefix}{date_prefix}/"
+        transaction_obj_prefix = f"{transactions_prefix}{date_prefix}/"
+        
+        block_objs.append(block_obj_prefix)
+        transaction_objs.append(transaction_obj_prefix)
+    
+    return(block_objs, transaction_objs)
+
+def download_and_verify(Bucket, Key, Filename):
+    s3_client = boto3.client("s3", config=Config(signature_version=UNSIGNED))
+
+    gcs_client = storage.Client(credentials=credentials, project='myproject')
+    bucket = client.get_bucket('mybucket')
+    blob = bucket.blob('myfile')
+    blob.upload_from_filename('myfile')
+
+    try:
+        # os.remove(Filename)
+        s3_client = boto3.client("s3", config=Config(signature_version=UNSIGNED))
+        s3_client.download_file(Bucket,Key,Filename)
+        
+
+        client = storage.Client(credentials=credentials, project='myproject')
+        bucket = client.get_bucket('mybucket')
+        blob = bucket.blob('myfile')
+        blob.upload_from_filename('myfile')
+
+        return os.path.exists(Filename)
+    except exceptions.ClientError as error:
+        print(error.response['Error']['Code']) #a summary of what went wrong
+        print(error.response['Error']['Message']) #explanation of what went wrong
+        return False
+
+
+
+def download_raw_data(block_files=[], transaction_files=[], outpath:str='raw/eth/'):
+    
+    s3_resource = boto3.resource('s3', config=Config(signature_version=UNSIGNED))
+    bucket = s3_resource.Bucket(bucket_name)
+    
+    for file_loc in block_files:
+        
+        bucket_obj = bucket.objects.filter(Prefix=file_loc)
+        fdate = file_loc.split('/')[3]
+        output_path = f"{blocks_output}/{fdate}/"
+        
+        if not os.path.isdir(output_path):
+            os.makedirs(output_path)
+        
+        for item in bucket_obj:       
+            file_name = f"{output_path}{item.key.split('/')[-1]}"
+            
+            if not os.path.isfile(file_name):
+                download_and_verify(bucket_name, item.key, file_name)
+                
+    
+    for file_loc in transaction_files:
+        
+        bucket_obj = bucket.objects.filter(Prefix=file_loc)
+        fdate = file_loc.split('/')[3]
+        output_path = f"{transaction_output}/{fdate}/"
+        
+        if not os.path.isdir(output_path):
+            os.makedirs(output_path)
+        
+        for item in bucket_obj:       
+            file_name = f"{output_path}{item.key.split('/')[-1]}"
+            
+            if not os.path.isfile(file_name):
+                download_and_verify(bucket_name, item.key, file_name)
+    
+    return True
+
+@data_loader
+def load_from_s3_bucket(*args, **kwargs):
+    """
+    Template for loading data from a S3 bucket.
+    Specify your configuration settings in 'io_config.yaml'.
+
+    Docs: https://docs.mage.ai/design/data-loading#s3
+    """
+    config_path = path.join(get_repo_path(), 'io_config.yaml')
+    config_profile = 'default'
+
+    
+    # object_key = 'v1.0/eth/transactions/date=2024-04-04/part-00000-73f3d0ec-20a4-4044-9015-ff6c7ffbdaa7-c000.snappy.parquet'
+    
+
+    x = os.getenv('RUN_DATE')
+    
+    run_date = dt.datetime.strptime(x, '%Y-%m-%d').date()
+    print(f"run_date: {run_date}")
+
+    
+    blocks, transactions = prepare_object_prefix(run_date)
+    return download_raw_data(blocks, transactions)
+
+    # return S3.with_config(ConfigFileLoader(config_path, config_profile)).load(
+    #     bucket_name,
+    #     object_key,
+    # )
+
+    bucket_name = 'ethereum_etl_datalake'
+    object_key = 'hello.parquet'
+
+    GoogleCloudStorage.with_config(ConfigFileLoader(config_path, config_profile)).export(
+        df,
+        bucket_name,
+        object_key,
+    )
+
+
+
+
+@test
+def test_output(output, *args) -> None:
+    """
+    Template code for testing the output of the block.
+    """
+    assert output is not None, 'The output is undefined'

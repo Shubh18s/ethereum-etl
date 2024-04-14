@@ -1,0 +1,22 @@
+version: '3'
+services:
+  magic:
+    image: mage_spark:latest
+    command: mage start ${PROJECT_NAME}
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      USER_CODE_PATH: /home/src/${PROJECT_NAME}
+      SPARK_MASTER_HOST: local
+      RUN_DATE: '2024-04-10'
+      GOOGLE_PROJECT_ID: 'quantum-fusion-417707'
+      BUCKET_NAME: 'ethereum_etl_datalake'
+    ports:
+      - 6789:6789
+    volumes:
+      - .:/home/src
+      - ~keys/:/home/src/keys/
+    restart: on-failure:5

@@ -26,8 +26,8 @@ def prepare_object_prefix(run_date:date):
     if not run_date:
         run_date = dt.date.today()
 
-    start_date = run_date - dt.timedelta(days=7)
-    end_date = run_date - dt.timedelta(days=0)
+    start_date = run_date - dt.timedelta(days=8)
+    end_date = run_date - dt.timedelta(days=1)
     
     block_objs = []
     transaction_objs = []
