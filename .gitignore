@@ -50,6 +50,9 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
+*.parquet
+*.file_versions
+*/mage_data/
 
 # Translations
 *.mo

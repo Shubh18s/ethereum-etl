@@ -2,33 +2,38 @@ blocks:
 - all_upstream_blocks_executed: true
   color: null
   configuration: {}
-  downstream_blocks: []
+  downstream_blocks:
+  - load_transaction_data_from_gcs
+  - load_blocks_data_from_gcs
   executor_config: null
   executor_type: local_python
   has_callback: false
   language: python
-  name: load_data_s3
+  name: load_raw_data_from_s3_to_gcs
   retry_config: null
   status: executed
   timeout: null
   type: data_loader
   upstream_blocks: []
-  uuid: load_data_s3
+  uuid: load_raw_data_from_s3_to_gcs
 - all_upstream_blocks_executed: true
   color: null
   configuration: {}
-  downstream_blocks: []
+  downstream_blocks:
+  - export_processed_transactions_to_gcs
+  - export_processed_transactions_to_bq
   executor_config: null
   executor_type: local_python
   has_callback: false
   language: python
-  name: remove_outliers_spark
+  name: convert_value_to_ethereum
   retry_config: null
   status: executed
   timeout: null
   type: transformer
-  upstream_blocks: []
-  uuid: remove_outliers_spark
+  upstream_blocks:
+  - filter_ethereum_transfer_transactions
+  uuid: convert_value_to_ethereum
 - all_upstream_blocks_executed: true
   color: null
   configuration: {}
@@ -37,13 +42,149 @@ blocks:
   executor_type: local_python
   has_callback: false
   language: python
-  name: save_to_gcs
+  name: export_processed_transactions_to_gcs
+  retry_config: null
+  status: updated
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - convert_value_to_ethereum
+  uuid: export_processed_transactions_to_gcs
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: export_processed_transactions_to_bq
   retry_config: null
   status: executed
   timeout: null
   type: data_exporter
-  upstream_blocks: []
-  uuid: save_to_gcs
+  upstream_blocks:
+  - convert_value_to_ethereum
+  uuid: export_processed_transactions_to_bq
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks:
+  - select_transaction_columns
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: load_transaction_data_from_gcs
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_loader
+  upstream_blocks:
+  - load_raw_data_from_s3_to_gcs
+  uuid: load_transaction_data_from_gcs
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks:
+  - select_block_columns
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: load_blocks_data_from_gcs
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_loader
+  upstream_blocks:
+  - load_raw_data_from_s3_to_gcs
+  uuid: load_blocks_data_from_gcs
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks:
+  - convert_value_to_ethereum
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: filter_ethereum_transfer_transactions
+  retry_config: null
+  status: executed
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - select_transaction_columns
+  uuid: filter_ethereum_transfer_transactions
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks:
+  - filter_ethereum_transfer_transactions
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: select_transaction_columns
+  retry_config: null
+  status: executed
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - load_transaction_data_from_gcs
+  - load_transaction_data_from_gcs
+  uuid: select_transaction_columns
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks:
+  - export_processed_blocks_to_gcs
+  - export_processed_blocks_to_bq
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: select_block_columns
+  retry_config: null
+  status: executed
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - load_blocks_data_from_gcs
+  uuid: select_block_columns
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: export_processed_blocks_to_gcs
+  retry_config: null
+  status: updated
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - select_block_columns
+  uuid: export_processed_blocks_to_gcs
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: export_processed_blocks_to_bq
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - select_block_columns
+  uuid: export_processed_blocks_to_bq
 cache_block_output_in_memory: false
 callbacks: []
 concurrency_config: {}

@@ -1,1 +1,23 @@
 project_uuid: 950a40c582d14065b3ee10777aefdd95
+
+spark_config:
+  # Application name
+  app_name: 'ethereum etl spark app'
+  # Master URL to connect to
+  # e.g., spark_master: 'spark://host:port', or spark_master: 'yarn'
+  spark_master: 'local'
+  # Executor environment variables
+  # e.g., executor_env: {'PYTHONPATH': '/home/path'}
+  executor_env: {}
+  # Jar files to be uploaded to the cluster and added to the classpath
+  # e.g., spark_jars: ['/home/path/example1.jar']
+  spark_jars: []
+  # Path where Spark is installed on worker nodes,
+  # e.g. spark_home: '/usr/lib/spark'
+  spark_home: null
+  # List of key-value pairs to be set in SparkConf
+  # e.g., others: {'spark.executor.memory': '4g', 'spark.executor.cores': '2'}
+  others: {"spark.jars": "./lib/gcs-connector-hadoop3-2.2.5.jar", 
+            "spark.hadoop.google.cloud.auth.service.account.enable": "true",
+            "spark.hadoop.google.cloud.auth.service.account.json.keyfile": "./keys/google_credentials.json",
+            "spark.sql.parquet.enableVectorizedReader": "false"}
