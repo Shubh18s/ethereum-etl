@@ -8,6 +8,7 @@ if 'test' not in globals():
     from mage_ai.data_preparation.decorators import test
 
 import os
+import datetime as dt
 
 @data_loader
 def load_from_google_cloud_storage(*args, **kwargs):
@@ -28,7 +29,7 @@ def load_from_google_cloud_storage(*args, **kwargs):
     from pyspark.sql import types
 
     spark = kwargs.get('spark')
-    
+    # spark = SparkSession.builder.master(os.getenv('SPARK_MASTER_HOST', 'local')).getOrCreate()
     spark_conf = spark.sparkContext.getConf()
     # spark_conf \
     #     .set("spark.jars", "./lib/gcs-connector-hadoop3-2.2.5.jar") \
@@ -79,7 +80,13 @@ def load_from_google_cloud_storage(*args, **kwargs):
     )
 
 
-    return spark.read.schema(transaction_schema).parquet('gs://ethereum_etl_datalake/raw/eth/transactions/date=2024-04-08/')
+    run_date = dt.date.today()
+    if(os.getenv('RUN_DATE') and os.getenv('RUN_DATE')!=''):
+        run_date = os.getenv('RUN_DATE')        
+        run_date = dt.datetime.strptime(run_date, '%Y-%m-%d').date()
+
+    bucket_name = os.getenv('BUCKET_NAME')
+    return spark.read.schema(transaction_schema).parquet(f"gs://{bucket_name}/run_date={run_date}/raw/eth/transactions/")
     # print(df_transactions.count())
     # return df_transactions
 

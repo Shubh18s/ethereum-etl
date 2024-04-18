@@ -11,7 +11,8 @@ services:
     environment:
       USER_CODE_PATH: /home/src/${PROJECT_NAME}
       SPARK_MASTER_HOST: local
-      RUN_DATE: '2024-04-10'
+      RUN_DATE: ''
+      DAYS_TO_TAKE:
       GOOGLE_PROJECT_ID: 'quantum-fusion-417707'
       BUCKET_NAME: 'ethereum_etl_datalake'
     ports:

@@ -3,6 +3,9 @@ from mage_ai.io.config import ConfigFileLoader
 from mage_ai.io.google_cloud_storage import GoogleCloudStorage
 from pandas import DataFrame
 from os import path
+import os
+
+import datetime as dt
 
 if 'data_exporter' not in globals():
     from mage_ai.data_preparation.decorators import data_exporter
@@ -38,7 +41,14 @@ def export_data_to_google_cloud_storage(df: DataFrame, **kwargs) -> None:
     hadoop_conf.set("fs.gs.auth.service.account.enable", "true")
 
 
+    run_date = dt.date.today()
+    if(os.getenv('RUN_DATE') and os.getenv('RUN_DATE')!=''):
+        run_date = os.getenv('RUN_DATE')        
+        run_date = dt.datetime.strptime(run_date, '%Y-%m-%d').date()
+
+    bucket_name = os.getenv('BUCKET_NAME')
+
     return df \
-        .repartition(4) \
+        .repartition(7) \
         .write \
-        .parquet('gs://{bucket_name}/processed/eth/blocks/date=2024-04-08/', mode='overwrite')
+        .parquet(f"gs://{bucket_name}/run_date={run_date}/processed/eth/blocks/", mode='overwrite')

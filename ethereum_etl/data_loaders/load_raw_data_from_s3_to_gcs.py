@@ -25,15 +25,16 @@ transactions_prefix = 'v1.0/eth/transactions/date='
 blocks_output = 'raw/eth/blocks'
 transaction_output = 'raw/eth/transactions'
 
-def prepare_object_prefix(run_date:date):
+def prepare_object_prefix(run_date:date, days_to_load:int):
+    
     
     if not run_date:
         run_date = dt.date.today()
 
-    start_date = run_date - dt.timedelta(days=8)
     end_date = run_date - dt.timedelta(days=1)
+    start_date = end_date - dt.timedelta(days=int(days_to_load))
     
-    print(f"Downloading data from {start_date} to {end_date} and loading to storage")
+    print(f"Downloading {days_to_load} days data starting from {start_date} and loading to storage")
 
     block_objs = []
     transaction_objs = []
@@ -71,9 +72,14 @@ def download_and_verify(Bucket, Key, Filename):
         print(error.response['Error']['Message']) #explanation of what went wrong
         return False
 
+def clear_bucket():
+    gcs_client = storage.Client.from_service_account_json('./keys/google_credentials.json')
+    gcs_bucket = gcs_client.get_bucket(os.getenv('BUCKET_NAME'))
 
+    blob = gcs_bucket.blob(blocks_output)
+    blob.delete()
 
-def download_raw_data(block_files=[], transaction_files=[], outpath:str='raw/eth/'):
+def download_raw_data(run_date:date, block_files=[], transaction_files=[]):
     
     s3_resource = boto3.resource('s3', config=Config(signature_version=UNSIGNED))
     bucket = s3_resource.Bucket(bucket_name)
@@ -81,11 +87,12 @@ def download_raw_data(block_files=[], transaction_files=[], outpath:str='raw/eth
     block_stage_files = []
     transaction_stage_files = []
 
+
     for file_loc in block_files:
         
         bucket_obj = bucket.objects.filter(Prefix=file_loc)
         fdate = file_loc.split('/')[3]
-        output_path = f"{blocks_output}/{fdate}/"
+        output_path = f"run_date={run_date}/{blocks_output}/{fdate}/"
         
         if not os.path.isdir(output_path):
             os.makedirs(output_path)
@@ -102,7 +109,7 @@ def download_raw_data(block_files=[], transaction_files=[], outpath:str='raw/eth
         
         bucket_obj = bucket.objects.filter(Prefix=file_loc)
         fdate = file_loc.split('/')[3]
-        output_path = f"{transaction_output}/{fdate}/"
+        output_path = f"run_date={run_date}/{transaction_output}/{fdate}/"
         
         if not os.path.isdir(output_path):
             os.makedirs(output_path)
@@ -127,13 +134,18 @@ def load_from_s3_bucket(*args, **kwargs):
     config_path = path.join(get_repo_path(), 'io_config.yaml')
     config_profile = 'default'
 
-    x = os.getenv('RUN_DATE')
-    run_date = dt.datetime.strptime(x, '%Y-%m-%d').date()
-    # print(f"run_date: {run_date}")
-
+    run_date = dt.date.today()
+    if(os.getenv('RUN_DATE') and os.getenv('RUN_DATE')!=''):
+        run_date = os.getenv('RUN_DATE')        
+        run_date = dt.datetime.strptime(run_date, '%Y-%m-%d').date()
     
-    blocks, transactions = prepare_object_prefix(run_date)
-    return download_raw_data(blocks, transactions)
+    days_to_load = 1
+    if(os.getenv('DAYS_TO_TAKE') and os.getenv('DAYS_TO_TAKE')!=''):
+        # print(os.getenv('DAYS_TO_TAKE'))
+        days_to_load= os.getenv('DAYS_TO_TAKE')
+    
+    blocks, transactions = prepare_object_prefix(run_date, days_to_load)
+    return download_raw_data(run_date, blocks, transactions)
 
     # return S3.with_config(ConfigFileLoader(config_path, config_profile)).load(
     #     bucket_name,

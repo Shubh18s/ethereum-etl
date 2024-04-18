@@ -9,7 +9,7 @@ if 'test' not in globals():
 
 
 import os
-
+import datetime as dt
 
 @data_loader
 def load_from_google_cloud_storage(*args, **kwargs):
@@ -65,7 +65,16 @@ def load_from_google_cloud_storage(*args, **kwargs):
                         ]
                     )
 
-    return spark.read.schema(block_schema).parquet('gs://ethereum_etl_datalake/raw/eth/blocks/date=2024-04-08/')
+
+    run_date = dt.date.today()
+    if(os.getenv('RUN_DATE') and os.getenv('RUN_DATE')!=''):
+        run_date = os.getenv('RUN_DATE')        
+        run_date = dt.datetime.strptime(run_date, '%Y-%m-%d').date()
+
+    bucket_name = os.getenv('BUCKET_NAME')
+
+    return spark.read.schema(block_schema).parquet(f"gs://{bucket_name}/run_date={run_date}/raw/eth/blocks/")
+    # date=2024-04-08
 
 
 @test

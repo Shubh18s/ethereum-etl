@@ -3,10 +3,15 @@ if 'transformer' not in globals():
 if 'test' not in globals():
     from mage_ai.data_preparation.decorators import test
 
-from pyspark.sql.functions import col, isnan, when, trim
+from pyspark.sql.functions import col, udf
 
-def to_null(c):
-    return when(~(col(c).isNull() | (trim(col(c)) == "")), col(c))
+@udf
+def convert_wei_to_gwei(amount):
+    return amount/(10**9)
+
+@udf
+def convert_wei_to_eth(amount):
+    return amount/(10**18)
 
 @transformer
 def transform(data, *args, **kwargs):
@@ -25,22 +30,16 @@ def transform(data, *args, **kwargs):
     """
     # Specify your transformation logic here
 
-    spark = kwargs.get('spark')
-    # print(spark.sql('select 1'))
+    from pyspark.sql import functions as F
+    from pyspark.sql import types
 
-    
-
-    transaction_columns = ['gas', 'nonce', 'from_address', 'to_address', 'value', 'block_number', 'gas_price',
-       'receipt_cumulative_gas_used', 'receipt_gas_used', 'receipt_status',
-       'receipt_effective_gas_price', 'transaction_type', 'max_fee_per_gas',
-       'max_priority_fee_per_gas', 'block_timestamp', 'date', 'last_modified']
-    
-    df_transaction = data.select(transaction_columns).withColumnRenamed('date', 'block_date')
-    
-    df_transaction = df_transaction.select([to_null(c).alias(c) for c in df_transaction.columns]).na.drop()
-
-    return df_transaction
-    # return df_transaction
+    df = data \
+            .withColumn('value_gwei', convert_wei_to_gwei("value").cast(types.FloatType())) \
+            .withColumn('max_fee_per_gas_gwei', convert_wei_to_gwei("max_fee_per_gas").cast(types.FloatType())) \
+            .withColumn('max_priority_fee_per_gas_gwei', convert_wei_to_gwei("max_priority_fee_per_gas").cast(types.FloatType())) \
+            .withColumn('receipt_effective_gas_price_gwei', convert_wei_to_gwei("receipt_effective_gas_price").cast(types.FloatType())) \
+            .withColumn('gas_price_gwei', convert_wei_to_gwei("gas_price").cast(types.FloatType()))
+    return df
 
 
 @test

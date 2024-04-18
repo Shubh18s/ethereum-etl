@@ -3,15 +3,7 @@ if 'transformer' not in globals():
 if 'test' not in globals():
     from mage_ai.data_preparation.decorators import test
 
-from pyspark.sql.functions import col, udf
-
-@udf
-def convert_wei_to_gwei(amount):
-    return amount/(10**9)
-
-@udf
-def convert_wei_to_eth(amount):
-    return amount/(10**18)
+from pyspark.sql.functions import col
 
 @transformer
 def transform(data, *args, **kwargs):
@@ -29,14 +21,11 @@ def transform(data, *args, **kwargs):
         Anything (e.g. data frame, dictionary, array, int, str, etc.)
     """
     # Specify your transformation logic here
-
-    from pyspark.sql import functions as F
-    
-
-    df = data \
-                    .withColumn('value_ethereum', convert_wei_to_eth("value"))
-    
-    return df
+    spark = kwargs.get('spark')
+    # data.na.drop().show()
+    data = data.filter(data.to_address.toString)
+    # data.filter(col("to_address").isNotNull)
+    # return data
 
 
 @test
