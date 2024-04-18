@@ -25,11 +25,13 @@ Ethereum-ETL uses the registry of open data on AWS (https://registry.opendata.aw
 
 With roughly a million transactions flowing through the ethereum network everyday, it was paramount to use Big Data technologies for fast and efficient data processsing and etl throughput. Ethereum-ETL uses Spark to extract transform and load ethereum data in parquet file format.
 
+![alt text](https://github.com/Shubh18s/ethereum-etl/blob/main/images/ethereum_etl_infra.jpg)
+
 Orchestrator - Mage (https://www.mage.ai/)
 
 ## How to run
 
-1. Create a GCP service account with below roles
+1. Create a GCP service account with below roles and create a 
     - Create Service Accounts
     - Service Account User
     - Service Usage Admin
