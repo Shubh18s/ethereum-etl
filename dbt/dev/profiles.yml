@@ -1,0 +1,10 @@
+ethereum_transformation:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account
+      project: 'quantum-fusion-417707'
+      dataset: 'ethereum_master'
+      threads: 4
+      keyfile: "/home/singh/keys/google_credentials.json"

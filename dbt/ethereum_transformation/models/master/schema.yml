@@ -1,0 +1,20 @@
+
+version: 2
+
+models:
+  - name: block_transactions
+    description: "Combined block transaction data"
+  - name: hourly_transactions_agg
+    description: "Hourly gas usage and price aggregates"
+    columns:
+      - name: HOUR_OF_DAY
+        description: "The primary key for this table"
+        tests:
+          - unique
+          - not_null
+sources:
+  - name: ethereum_master
+    schema: ethereum_master  
+    tables:
+      - name: ethereum_blocks
+      - name: ethereum_transactions

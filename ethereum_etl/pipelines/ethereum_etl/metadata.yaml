@@ -26,14 +26,14 @@ blocks:
   executor_type: local_python
   has_callback: false
   language: python
-  name: convert_value_to_ethereum
+  name: convert_value_to_gwei
   retry_config: null
   status: executed
   timeout: null
   type: transformer
   upstream_blocks:
   - filter_ethereum_transfer_transactions
-  uuid: convert_value_to_ethereum
+  uuid: convert_value_to_gwei
 - all_upstream_blocks_executed: true
   color: null
   configuration: {}
@@ -48,7 +48,7 @@ blocks:
   timeout: null
   type: data_exporter
   upstream_blocks:
-  - convert_value_to_ethereum
+  - convert_value_to_gwei
   uuid: export_processed_transactions_to_gcs
 - all_upstream_blocks_executed: true
   color: null
@@ -64,7 +64,7 @@ blocks:
   timeout: null
   type: data_exporter
   upstream_blocks:
-  - convert_value_to_ethereum
+  - convert_value_to_gwei
   uuid: export_processed_transactions_to_bq
 - all_upstream_blocks_executed: true
   color: null
@@ -104,7 +104,7 @@ blocks:
   color: null
   configuration: {}
   downstream_blocks:
-  - convert_value_to_ethereum
+  - convert_value_to_gwei
   executor_config: null
   executor_type: local_python
   has_callback: false
