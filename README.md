@@ -81,7 +81,7 @@ Data Visualisation - Tableu
 4. Run `dbt build --profiles-dir ./dev --project-dir ./ethereum_transformation/`
 
 ### Visualisations
-![alt text](https://github.com/Shubh18s/ethereum-etl/blob/main/images/visualizations_tableua.png)
+![alt text](https://github.com/Shubh18s/ethereum-etl/blob/main/images/visualizations_tableau.png)
 
 <!-- ## Next steps
 DataProc
