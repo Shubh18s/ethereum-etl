@@ -68,9 +68,11 @@ Data Visualisation - Tableu
     ```RUN_DATE``` = Date for which you want to run pipeline. Default is today's date. Data will be ingested to 2 days before RUN_DATE.
     ```DAYS_TO_TAKE``` = Number of days to ingest data for. Default is 1.
 
-6. Update GOOGLE_SERVICE_ACC_KEY_FILEPATH in ethereum_etl/io_config.yaml with the google_credentials file name.
+6. Run ```docker-compose up -d```
 
-7. Open localhost:6789 for Mage UI and run pipeline once using pipeline trigger -
+7. Update GOOGLE_SERVICE_ACC_KEY_FILEPATH in ```ethereum_etl/io_config.yaml``` with the google_credentials file name.
+
+8. Open localhost:6789 for Mage UI and run pipeline once using pipeline trigger -
 
 ![alt text](https://github.com/Shubh18s/ethereum-etl/blob/main/images/pipeline_trigger.png)
 
@@ -86,7 +88,7 @@ Data Visualisation - Tableu
 3. To check connection from dbt directory run -
     ```dbt debug --profiles-dir ./dev --project-dir ./ethereum_transformation/```
 
-4. Run -
+4. Run in dbt directory -
     ```dbt build --profiles-dir ./dev --project-dir ./ethereum_transformation/```
 
 ### Visualisations
