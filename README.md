@@ -1,6 +1,8 @@
 # Ethereum-ETL
 Ethereum ETL lets you process and ingest daily ethereum blocks and transaction data and into a DataLake (GCS) and Data Warehouse (BigQuery).
 
+![alt text](https://github.com/Shubh18s/ethereum-etl/blob/main/images/logo.png)
+
 ## Usecase
 The ethereum network usage continues to grow with roughly 1 million transactions executed every day. This includes the normal payment transfers as well as the smart contracts being executed on the ethereum network. This increase in on-chain data has led to a higher usage of Gas -- the computational resources or effort required to execute transactions on the ethereum network.
 
@@ -49,16 +51,17 @@ Data Visualisation - Tableu
     - Storage Admin
     - Storage Object Admin
 
-2. Create a Google Cloud Storage bucket - 'ethereum_etl_datalake'
+2. Create a Google Cloud Storage bucket - ```'ethereum_etl_datalake'```
 
-3. Create a Google Cloud Bigquery dataset - 'ethereum_master'
+3. Create a Google Cloud Bigquery dataset - ```'ethereum_master'```
 
-4. Save the google credentials in a file on machine and run below commands in terminal
-    `export PATH_TO_GOOGLE_CREDENTIALS='path/to/keys/folder/'`
-    `export GOOGLE_PROJECT_ID='quantum-fusion-417707'`
-    `export BUCKET_NAME='ethereum_etl_datalake'`
-5. Update the RUN_DATE and DAYS_TO_TAKE parameter in dev.env file and run command
-    `cp dev.env .env`
+4. Save the google credentials in a file on machine and run below commands in terminal - 
+
+    ```export PATH_TO_GOOGLE_CREDENTIALS='PATH/TO/KEYS/FOLDER/'```
+    ```export GOOGLE_PROJECT_ID='<YOUR-PROJECT-ID>'```
+    ```export BUCKET_NAME='<BUCKET-NAME>'```
+5. Update the RUN_DATE and DAYS_TO_TAKE parameter in dev.env file and run command - 
+    ```cp dev.env .env```
 
     RUN_DATE = Date for which you want to run pipeline. Default is today's date. Data will be ingested to 2 days before RUN_DATE.
     DAYS_TO_TAKE = Number of days to ingest data for. Default is 1.
@@ -72,13 +75,13 @@ Data Visualisation - Tableu
 
 ### Running DBT transformations
 
-1. Install Pipenv using `pip install pipenv`. 
+1. Install Pipenv using ```pip install pipenv```. 
 
 2. Goto dbt directory and update dev/profiles.yml with the correct project, dataset and keyfile.
 
-3. To check connection from dbt directory run `dbt debug --profiles-dir ./dev --project-dir ./ethereum_transformation/`
+3. To check connection from dbt directory run ```dbt debug --profiles-dir ./dev --project-dir ./ethereum_transformation/```
 
-4. Run `dbt build --profiles-dir ./dev --project-dir ./ethereum_transformation/`
+4. Run ```dbt build --profiles-dir ./dev --project-dir ./ethereum_transformation/```
 
 ### Visualisations
 ![alt text](https://github.com/Shubh18s/ethereum-etl/blob/main/images/visualizations_tableau.png)
