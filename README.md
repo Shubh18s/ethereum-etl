@@ -1,4 +1,4 @@
-# Ethereum ETL
+# Ethereum-ETL
 Ethereum ETL lets you process and ingest daily ethereum blocks and transaction data and into a DataLake (GCS) and Data Warehouse (BigQuery).
 
 ## Usecase
@@ -17,10 +17,29 @@ Tools such as Etherscan and other Gas Estimators have been in market to guide us
 Read more about introduction to ethereum here - https://ethereum.org/en/developers/docs/intro-to-ethereum/
 Using Spark
 
-Create a GCP service account with below permissions
+## Data Source
+Ethereum-ETL uses the registry of open data on AWS (https://registry.opendata.aws/) to extract data for ethereum specific blocks and transactions from https://registry.opendata.aws/aws-public-blockchain/
 
 
-# Data Source
+## Architecture
+
+With roughly a million transactions flowing through the ethereum network everyday, it was paramount to use Big Data technologies for fast and efficient data processsing and etl throughput. Ethereum-ETL uses Spark to extract transform and load ethereum data in parquet file format.
+
+Orchestrator - Mage (https://www.mage.ai/)
+
+## How to run
+
+1. Create a GCP service account with below roles
+    - Create Service Accounts
+    - Service Account User
+    - Service Usage Admin
+    - Storage Admin
+    - Storage Object Admin
+
+2. Create a Google Cloud Storage bucket - 'ethereum_etl_datalake'
+
+3. Create a Google Cloud Bigquery dataset - 'ethereum_master'
+
 export PATH_TO_GOOGLE_CREDENTIALS='/home/singh/keys/'
 export GOOGLE_PROJECT_ID='quantum-fusion-417707'
 export BUCKET_NAME='ethereum_etl_datalake'
@@ -34,3 +53,16 @@ dbt debug --profiles-dir ./dev --project-dir ./ethereum_transformation/
 
 dbt build --profiles-dir ./dev --project-dir ./ethereum_transformation/
 
+## Next steps
+DataProc
+Deployment to Cloud Run
+
+## Acknowledgments and Guidance
+
+- https://github.com/aws-solutions-library-samples/guidance-for-digital-assets-on-aws/tree/main
+
+
+# Developer
+
+### Shubhdeep Singh (singh18shubhdeep@gmail.com)
+### [LinkedIn](https://www.linkedin.com/in/shubh18s/)
