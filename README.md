@@ -58,32 +58,41 @@ Data Visualisation - Tableu
 4. Save the google credentials in a file on machine and run below commands in terminal - 
 
     ```export PATH_TO_GOOGLE_CREDENTIALS='PATH/TO/KEYS/FOLDER/'```
+
     ```export GOOGLE_PROJECT_ID='<YOUR-PROJECT-ID>'```
+
     ```export BUCKET_NAME='<BUCKET-NAME>'```
+
 5. Update the RUN_DATE and DAYS_TO_TAKE parameter in dev.env file and run command - 
+
     ```cp dev.env .env```
 
-    RUN_DATE = Date for which you want to run pipeline. Default is today's date. Data will be ingested to 2 days before RUN_DATE.
-    DAYS_TO_TAKE = Number of days to ingest data for. Default is 1.
+    ```RUN_DATE``` = Date for which you want to run pipeline. Default is today's date. Data will be ingested to 2 days before RUN_DATE.
+    ```DAYS_TO_TAKE``` = Number of days to ingest data for. Default is 1.
 
 6. Update GOOGLE_SERVICE_ACC_KEY_FILEPATH in ethereum_etl/io_config.yaml with the google_credentials file name.
 
 7. Open localhost:6789 for Mage UI and run pipeline once using pipeline trigger -
+
 ![alt text](https://github.com/Shubh18s/ethereum-etl/blob/main/images/pipeline_trigger.png)
 
 ![alt text](https://github.com/Shubh18s/ethereum-etl/blob/main/images/mage_pipeline.png)
 
 ### Running DBT transformations
 
-1. Install Pipenv using ```pip install pipenv```. 
+1. Install Pipenv using -
+    ```pip install pipenv```
 
 2. Goto dbt directory and update dev/profiles.yml with the correct project, dataset and keyfile.
 
-3. To check connection from dbt directory run ```dbt debug --profiles-dir ./dev --project-dir ./ethereum_transformation/```
+3. To check connection from dbt directory run -
+    ```dbt debug --profiles-dir ./dev --project-dir ./ethereum_transformation/```
 
-4. Run ```dbt build --profiles-dir ./dev --project-dir ./ethereum_transformation/```
+4. Run -
+    ```dbt build --profiles-dir ./dev --project-dir ./ethereum_transformation/```
 
 ### Visualisations
+
 ![alt text](https://github.com/Shubh18s/ethereum-etl/blob/main/images/visualizations_tableau.png)
 
 <!-- ## Next steps
@@ -92,6 +101,7 @@ Deployment to Cloud Run -->
 
 ## Acknowledgments and Guidance
 
+- https://ethereum-etl.readthedocs.io/en/latest/
 - https://github.com/aws-solutions-library-samples/guidance-for-digital-assets-on-aws/tree/main
 
 
