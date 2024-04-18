@@ -27,11 +27,22 @@ With roughly a million transactions flowing through the ethereum network everyda
 
 ![alt text](https://github.com/Shubh18s/ethereum-etl/blob/main/images/ethereum_etl_infra.jpg)
 
-Orchestrator - Mage (https://www.mage.ai/)
+Orchestrator - I used Mage (https://www.mage.ai/) to create a custom Spark Session at the Project Level. This allowed for running spark jobs within all the pipeline blocks without the need to create spark session every time we execute the next block.
+
+Another advantage was that I could provide the spark_config and spark jars as config in the metadata.yaml to connect to GCS.
+
+Data Lake - Google Cloud Storage
+
+Data Warehouse - Google Bigquery
+
+Data Transformation for Analysis - DBT
+
+Data Visualisation - Tableu
 
 ## How to run
 
-1. Create a GCP service account with below roles and create a 
+### Running ethereum_etl pipeline
+1. Create a GCP service account with below roles and generate credentials as json.
     - Create Service Accounts
     - Service Account User
     - Service Usage Admin
@@ -42,22 +53,39 @@ Orchestrator - Mage (https://www.mage.ai/)
 
 3. Create a Google Cloud Bigquery dataset - 'ethereum_master'
 
-export PATH_TO_GOOGLE_CREDENTIALS='/home/singh/keys/'
-export GOOGLE_PROJECT_ID='quantum-fusion-417707'
-export BUCKET_NAME='ethereum_etl_datalake'
+4. Save the google credentials in a file on machine and run below commands in terminal
+    `export PATH_TO_GOOGLE_CREDENTIALS='path/to/keys/folder/'`
+    `export GOOGLE_PROJECT_ID='quantum-fusion-417707'`
+    `export BUCKET_NAME='ethereum_etl_datalake'`
+5. Update the RUN_DATE and DAYS_TO_TAKE parameter in dev.env file and run command
+    `cp dev.env .env`
 
+    RUN_DATE = Date for which you want to run pipeline. Default is today's date. Data will be ingested to 2 days before RUN_DATE.
+    DAYS_TO_TAKE = Number of days to ingest data for. Default is 1.
 
-cp dev.env .env
+6. Update GOOGLE_SERVICE_ACC_KEY_FILEPATH in ethereum_etl/io_config.yaml with the google_credentials file name.
 
+7. Open localhost:6789 for Mage UI and run pipeline once using pipeline trigger -
+![alt text](https://github.com/Shubh18s/ethereum-etl/blob/main/images/pipeline_trigger.png)
 
-dbt debug --profiles-dir ./dev --project-dir ./ethereum_transformation/
+![alt text](https://github.com/Shubh18s/ethereum-etl/blob/main/images/mage_pipeline.png)
 
+### Running DBT transformations
 
-dbt build --profiles-dir ./dev --project-dir ./ethereum_transformation/
+1. Install Pipenv using `pip install pipenv`. 
 
-## Next steps
+2. Goto dbt directory and update dev/profiles.yml with the correct project, dataset and keyfile.
+
+3. To check connection from dbt directory run `dbt debug --profiles-dir ./dev --project-dir ./ethereum_transformation/`
+
+4. Run `dbt build --profiles-dir ./dev --project-dir ./ethereum_transformation/`
+
+### Visualisations
+![alt text](https://github.com/Shubh18s/ethereum-etl/blob/main/images/visualizations_tableua.png)
+
+<!-- ## Next steps
 DataProc
-Deployment to Cloud Run
+Deployment to Cloud Run -->
 
 ## Acknowledgments and Guidance
 
