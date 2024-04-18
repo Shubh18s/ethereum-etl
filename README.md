@@ -1,7 +1,7 @@
 # Ethereum-ETL
 Ethereum ETL lets you process and ingest daily ethereum blocks and transaction data and into a DataLake (GCS) and Data Warehouse (BigQuery).
 
-![alt text](https://github.com/Shubh18s/ethereum-etl/blob/main/images/logo.png)
+![alt text](https://github.com/Shubh18s/ethereum-etl/blob/main/images/ethereum_etl_infra.jpg)
 
 ## Usecase
 The ethereum network usage continues to grow with roughly 1 million transactions executed every day. This includes the normal payment transfers as well as the smart contracts being executed on the ethereum network. This increase in on-chain data has led to a higher usage of Gas -- the computational resources or effort required to execute transactions on the ethereum network.
@@ -26,8 +26,6 @@ Ethereum-ETL uses the registry of open data on AWS (https://registry.opendata.aw
 ## Architecture
 
 With roughly a million transactions flowing through the ethereum network everyday, it was paramount to use Big Data technologies for fast and efficient data processsing and etl throughput. Ethereum-ETL uses Spark to extract transform and load ethereum data in parquet file format.
-
-![alt text](https://github.com/Shubh18s/ethereum-etl/blob/main/images/ethereum_etl_infra.jpg)
 
 Orchestrator - I used Mage (https://www.mage.ai/) to create a custom Spark Session at the Project Level. This allowed for running spark jobs within all the pipeline blocks without the need to create spark session every time we execute the next block.
 
